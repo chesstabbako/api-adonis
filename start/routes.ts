@@ -13,10 +13,14 @@ import router from '@adonisjs/core/services/router'
 import SessionController from '#controllers/session_controller';
 import LogoutsController from '#controllers/logouts_controller';
 import { middleware } from './kernel.js';
+import TasksController from '#controllers/tasks_controller';
 
-router.resource('api', UsersController);
+router.resource('api', UsersController)
+
+router.resource('api/tasks', TasksController)
 
 router.post('api/login', [SessionController, 'login'])
 
 router.post('api/logout', [LogoutsController, 'logout'])
   .use(middleware.auth())
+
