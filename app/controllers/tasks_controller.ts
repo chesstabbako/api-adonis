@@ -19,9 +19,9 @@ export default class TasksController {
   /**
    * Handle form submission for the create action
    */
-  async store({ request, response }: HttpContext) {
+  async store({ request, response, auth }: HttpContext) {
 
-    const task:Task= await Task.create(request.all())
+    const task:Task= await Task.create({user_id: auth?.user?.id, ...request.only(['task', 'status'])})
     return task;
   }
 
@@ -34,9 +34,9 @@ export default class TasksController {
 
     const user= await User.findOrFail(auth?.user?.id)
 
-    if(user.id !== auth?.user?.id){
+    if(task.userId !== auth?.user?.id){
 
-      return response.abort('This user is not auth')
+      return response.abort('You are not allowed to do this process')
     }
 
     return response.json({
@@ -45,20 +45,11 @@ export default class TasksController {
     })
   }
 
-  /**
-   * Edit individual record
-   */
-  async edit({ params }: HttpContext) {}
-
-  /**
-   * Handle form submission for the edit action
-   */
   async update({ params, request }: HttpContext) {
 
     const task: Task | null = await Task.findOrFail(request.param('id'))
     task.task = request.input('task')
     task.status = request.input('status')
-    task.userId = request.input('user_id')
     await task.save()
    
   }
@@ -66,9 +57,15 @@ export default class TasksController {
   /**
    * Delete record
    */
-  async destroy({ request, params }: HttpContext) {
+  async destroy({ request, params, auth, response }: HttpContext) {
    
     const task: Task | null = await Task.findOrFail(request.param('id'))
+
+    if(auth?.user?.id !== task.userId){
+
+      return response.abort('You are not allowed to do this process')
+    }
+
     await task.delete()
 
   }
