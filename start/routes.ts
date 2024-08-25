@@ -15,12 +15,17 @@ import LogoutsController from '#controllers/logouts_controller';
 import { middleware } from './kernel.js';
 import TasksController from '#controllers/tasks_controller';
 
-router.resource('api', UsersController)
-
-router.resource('api/tasks', TasksController)
+router.resource('api/users', UsersController)
 
 router.post('api/login', [SessionController, 'login'])
 
+router.resource('api/tasks', TasksController).use(
+  ['store', 'show', 'destroy'],
+  middleware.auth()
+)
+
 router.post('api/logout', [LogoutsController, 'logout'])
   .use(middleware.auth())
+
+  
 
