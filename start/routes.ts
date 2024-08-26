@@ -15,7 +15,9 @@ import LogoutsController from '#controllers/logouts_controller';
 import { middleware } from './kernel.js';
 import TasksController from '#controllers/tasks_controller';
 
-router.resource('api/users', UsersController).only(['store'])
+router.resource('api/users', UsersController).only(['store', 'index']).use(
+  ['index'],
+  middleware.auth())
 
 router.post('api/login', [SessionController, 'login'])
 
